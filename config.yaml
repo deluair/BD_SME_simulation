@@ -1,0 +1,142 @@
+# Simulation Configuration for Bangladesh SME Sector (2025-2035)
+
+simulation_parameters:
+  start_year: 2025
+  end_year: 2035
+  time_step: 1 # Yearly simulation step
+  random_seed: 42
+
+data_sources:
+  use_synthetic_data: true # Set to true to generate data, false to load from files
+  # Define paths or API endpoints for data (used if use_synthetic_data is false)
+  # bbs_census: "path/to/bbs_data.csv"
+  # sme_foundation_data: "path/to/smef_data.xlsx"
+  # bangladesh_bank_stats: "api/or/path/bb_stats.json"
+
+# --- Default Model Parameters --- 
+# These are used unless overridden by a specific scenario
+default_parameters:
+  sme_segmentation:
+    initial_population: 10000 # Target population size if models handled entry/exit
+    num_synthetic_smes: 100000 # Number of SMEs to generate initially
+    sector_distribution: 
+      manufacturing: 0.30
+      services: 0.45
+      agribusiness: 0.20
+      other: 0.05
+    size_distribution: # Based on employment often used in BD definitions
+      "Micro (<10 employees)": 0.85 # Quoted due to special characters
+      "Small (10-49 employees)": 0.12
+      "Medium (50-249 employees)": 0.03
+    formality_distribution:
+      Informal: 0.80
+      Formal: 0.20
+    location_distribution: # Simplified
+      Urban: 0.60
+      Rural: 0.40
+    avg_business_age: 5 # Average starting age in years
+    # Example BDT range - NEEDS REALISTIC ADJUSTMENT
+    initial_revenue_range: [100000, 10000000] # Micro ~100k-1M, Small 1M-10M, Med 10M+ ?? 
+    initial_debt_ratio_range: [0.0, 0.6] # Debt as % of assets/revenue
+    initial_creditworthiness_range: [0.3, 0.8] # Scale 0-1
+
+  financing:
+    initial_formal_access_rate: 0.25 # Proportion of formal SMEs with initial access
+    base_loan_seek_prob: 0.20 # Base probability an SME *seeks* a loan each year
+    base_loan_approval_prob_factor: 0.5 # Base factor, modified by creditworthiness etc.
+    interest_rate_mean: 0.09 # Average annual interest rate
+    interest_rate_stddev: 0.02
+    max_debt_ratio_threshold: 0.7 # SMEs above this less likely to get loans
+    credit_guarantee_effectiveness: 0.15 # Additive increase in approval prob if guarantee available
+
+  technology_adoption:
+    initial_digital_literacy_range: [0.1, 0.6] # Scale 0-1
+    base_adoption_prob: 0.05 # Base probability to adopt *available* tech each year
+    tech_cost_factor_revenue: 0.02 # Tech cost relative to annual revenue (example)
+    digital_literacy_improvement_rate: 0.02 # Annual increase in avg literacy 
+    tech_productivity_boost: 0.03 # % increase in productivity from adoption
+
+  market_access:
+    base_ecommerce_adoption_prob: 0.10
+    ecommerce_revenue_boost: 0.05 # % boost if using e-commerce
+    market_demand_growth_rate: 0.02 # General annual market growth
+
+  human_capital:
+    initial_skill_level_range: [1, 5] # Scale 1-10 (example)
+    base_skill_improvement_prob: 0.05
+    skill_training_effectiveness: 0.5 # Increase in skill level from training
+    skill_productivity_impact: 0.02 # % productivity increase per skill point
+
+  regulatory:
+    base_compliance_cost_factor: 0.01 # Percentage of revenue for formal firms
+    formalization_prob_factor: 0.01 # Base annual prob of informal becoming formal
+    tax_rate_revenue: 0.10 # Simplified tax rate on profit (if profit calculated)
+
+  business_environment:
+    initial_infrastructure_index: 0.5 # Scale 0-1
+    infrastructure_improvement_rate: 0.005 # Annual improvement
+    political_stability_index: 0.6 # Scale 0-1 (can be dynamic)
+
+  innovation:
+    base_innovation_prob: 0.02 # Prob of becoming innovator
+    innovation_revenue_boost: 0.04 # % boost if innovator
+
+  sustainability:
+    base_sustainability_adoption_prob: 0.02
+    sustainability_cost_reduction: 0.01 # % cost reduction if adopted
+
+  resilience:
+    initial_resilience_score_range: [0.2, 0.7] # Scale 0-1
+    base_resilience_improvement_prob: 0.03 
+    shock_event_prob: 0.05 # Annual probability of a negative shock
+    shock_impact_factor: 0.10 # % reduction in revenue/operations from shock
+
+  internationalization:
+    min_revenue_for_export: 5000000 # BDT, example threshold
+    min_size_for_export: "Small (10-49 employees)" # Minimum size category 
+    base_export_start_prob: 0.01 # For eligible firms
+    export_revenue_boost: 0.10 # % boost if exporter
+
+  inclusion:
+    initial_inclusion_score_range: [0.1, 0.5] # Scale 0-1 (women/youth/marginalized)
+    base_inclusion_improvement_prob: 0.02
+    inclusion_performance_link: 0.01 # e.g., small boost to revenue/resilience
+
+# --- Scenarios --- 
+# Each scenario can override specific parameters from default_parameters
+scenarios:
+  baseline:
+    description: "Business-as-usual scenario based on current trends and default parameters."
+    # No overrides needed, uses defaults.
+
+  pro_investment:
+    description: "Scenario simulating increased government/private sector support."
+    # Overrides:
+    regulatory:
+      base_compliance_cost_factor: 0.008 # Reduced compliance cost (overrides default 0.01)
+    financing:
+      base_loan_approval_prob_factor: 0.65 # Higher chance of getting loans (overrides default 0.5)
+      credit_guarantee_effectiveness: 0.25 # More effective guarantees
+    business_environment:
+      infrastructure_improvement_rate: 0.008 # Faster infra improvement (overrides default 0.005)
+
+  digital_leap:
+    description: "Scenario focusing on accelerated technology adoption and digital infrastructure."
+    # Overrides:
+    technology_adoption:
+      base_adoption_prob: 0.10 # Higher base adoption rate (overrides default 0.05)
+      digital_literacy_improvement_rate: 0.05 # Faster learning (overrides default 0.02)
+      tech_productivity_boost: 0.05 # Higher boost from tech
+    market_access:
+      base_ecommerce_adoption_prob: 0.20 # Higher e-commerce uptake
+      ecommerce_revenue_boost: 0.08 # Higher boost from e-commerce (overrides default 0.05)
+    business_environment:
+      # Assume digital push also improves specific infra aspects
+      infrastructure_improvement_rate: 0.007 # Slightly faster overall improvement
+
+# Add more scenarios below as needed, following the pattern:
+# scenario_name:
+#   description: "Description..."
+#   # Overrides:
+#   model_name:
+#     parameter_name: new_value

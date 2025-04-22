@@ -1,0 +1,13 @@
+# Core Libraries
+pandas
+numpy
+PyYAML
+matplotlib
+
+# Potential Future Libraries (Add as needed)
+# scipy
+# seaborn
+# scikit-learn
+# networkx
+# mesa        # For Agent-Based Modeling
+# pysd        # For System Dynamics
